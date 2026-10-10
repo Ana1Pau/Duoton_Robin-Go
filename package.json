@@ -1,0 +1,10 @@
+{
+  "name": "reap-shopping-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "start": "python3 -m http.server 4173 --directory dist",
+    "start:local": "node server/local-server.mjs"
+  }
+}

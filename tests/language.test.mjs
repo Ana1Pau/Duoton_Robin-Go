@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {spanish} from '../dist/es.mjs';
+test('translates checkout and business actions without changing amounts',()=>{assert.equal(spanish('Approve & reserve'),'Aprobar y reservar');assert.equal(spanish('I approve this demo order for $144.72'),'Apruebo este pedido de demostración por $144.72');});
+test('translation is stable and leaves identifiers untouched',()=>{for(const text of ['Cancel checkout','Company workspace · Demo','All products','Everyday Headphones'])assert.equal(spanish(spanish(text)),spanish(text));assert.equal(spanish('company_overview p1 USD REAP'),'company_overview p1 USD REAP');});

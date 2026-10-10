@@ -1,0 +1,9 @@
+// Browser-safe presentation logic only; no API credentials or provider requests.
+export const REAP_DOCS='https://docs.reap.global/agentic-payments/overview';
+export const enrollmentStatuses=['REQUIRES_ACTION','ACTIVE','REVOKED','FAILED','EXPIRED'];
+export const checkoutStatuses=['REQUIRES_ACTION','PROCESSING','COMPLETED','FAILED','EXPIRED'];
+export function checkoutResult(checkout){switch(checkout?.status){case 'REQUIRES_ACTION':return {label:'Pendiente de aprobación en REAP',complete:false};case 'PROCESSING':return {label:'REAP está procesando la compra',complete:false};case 'COMPLETED':if(!checkout.orderId||!checkout.finalAmount)throw Error('Completed checkout is missing its order or charged amount');return {label:'Compra confirmada',complete:true,orderId:checkout.orderId,finalAmount:checkout.finalAmount};case 'FAILED':return {label:'Falló la compra. Necesita cotización y checkout nuevos.',complete:false,terminal:true};case 'EXPIRED':return {label:'Checkout vencido. Necesita cotización y checkout nuevos.',complete:false,terminal:true};default:return {label:'Estado sin verificar. No confirmar el pago.',complete:false};}}
+// Explicitly support the 2-decimal currencies used by this app. Other currencies
+// require their own exponent before integration. Never copy cents into API amount.
+export function fromReapAmount({amount,currency}={}){if(!['USD','EUR','MXN'].includes(currency))throw Error('Currency precision not configured');if(!/^\d+(\.\d{1,2})?$/.test(String(amount)))throw Error('Invalid monetary amount');const [whole,fraction='']=String(amount).split('.');const minor=Number(whole)*100+Number(fraction.padEnd(2,'0'));if(!Number.isSafeInteger(minor))throw Error('Amount out of range');return {minor,currency};}
+export function quoteReady(quote){return Number.isFinite(Date.parse(quote?.expiresAt))&&Date.parse(quote.expiresAt)>Date.now();}

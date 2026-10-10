@@ -1,0 +1,8 @@
+// Device-local database; never stores card credentials or claims server sync.
+let opening;
+export function openDB(){if(!globalThis.indexedDB)return Promise.reject(Error('Este navegador no permite abrir la base de datos local.'));if(!opening)opening=new Promise((resolve,reject)=>{const request=indexedDB.open('reap-workspace',1);request.onupgradeneeded=()=>{const db=request.result;db.createObjectStore('snapshots',{keyPath:'id'});const expenses=db.createObjectStore('expenses',{keyPath:'id'});expenses.createIndex('scope','scope');};request.onsuccess=()=>{const db=request.result;db.onversionchange=()=>{db.close();opening=undefined;};resolve(db);};request.onerror=()=>{opening=undefined;reject(request.error);};request.onblocked=()=>{opening=undefined;reject(Error('Cierra otras pestañas de REAP para actualizar la base local.'));};});return opening;}
+async function transaction(storeName,mode,operation){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(storeName,mode);let result;try{const request=operation(tx.objectStore(storeName));request.onsuccess=()=>result=request.result;}catch(error){tx.abort();reject(error);return;}tx.oncomplete=()=>resolve(result);tx.onabort=()=>reject(tx.error||Error('No se pudo guardar.'));tx.onerror=()=>reject(tx.error);});}
+export const loadSnapshot=id=>transaction('snapshots','readonly',store=>store.get(id)).then(row=>row?.value??null);
+export const saveSnapshot=(id,value)=>transaction('snapshots','readwrite',store=>store.put({id,value,updatedAt:new Date().toISOString()}));
+export const listExpenses=()=>transaction('expenses','readonly',store=>store.getAll());
+export const saveExpense=record=>transaction('expenses','readwrite',store=>store.put(record));
