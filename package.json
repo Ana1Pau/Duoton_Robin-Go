@@ -1,10 +1,30 @@
 {
-  "name": "reap-shopping-prototype",
+  "name": "katerbot",
+  "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "description": "Katerbot - agente de despensa y pagos agénticos con Reap (hackathon Agentic Payments)",
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
-    "start": "python3 -m http.server 4173 --directory dist",
-    "start:local": "node server/local-server.mjs"
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test:robin": "node --test tests/robin/*.test.mjs"
+  },
+  "dependencies": {
+    "mssql": "^11.0.1",
+    "next": "15.5.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/mssql": "^9.1.7",
+    "@types/node": "^20.17.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.3"
   }
 }
